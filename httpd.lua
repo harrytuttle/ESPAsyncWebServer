@@ -47,11 +47,10 @@ local wsdec,wsenc=function(c)
   local extra = sub(c, offset + len + 1)
   local opcode = band(first, 0xf)
   return extra, payload, opcode
-end,function(msg, opcode)--opcode 0x1 is string, 0x9 is ping, 0xA is pong, 0x80 is FIN, mask is always 0
-  opcode = opcode or 2
+end,function(msg)--opcode 0x1 is string, 0x9 is ping, 0xA is pong, 0x80 is FIN, mask is always 0
   local len = #msg
   local head = char(
-    bor(0x80, opcode),
+    bor(0x80, 0x1),
     len < 126 and len or (len < 0x10000) and 126 or 127
   )
   if len >= 126 then
