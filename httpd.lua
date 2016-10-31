@@ -37,6 +37,7 @@ return function(port,pwd,wscb)
     c:on("receive",function(c,r)
       local url,hdrs,body=r:match("^%w- /(.-) HTTP/1.-\r\n(.-)\r\n\r\n(.*)")
       if not hdrs then return reply(c,"400")end
+      local key=hdrs:match("Sec%-WebSocket%-Key: (.-)\r")
     end)
     c:on("disconnection",function(c)websockets[c]=nil end)
   end)
