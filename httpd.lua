@@ -1,5 +1,8 @@
 return function(port,pwd,wscb)
   local websockets,gzmagic={},string.char(0x5e,0x1f,0x8b)
+  local reply=function(c,msg,typ,len)
+    c:send("HTTP/1.1 "..(tonumber(msg)and msg or 200).." OK\r\nContent-Type: "..(typ or "text/html")..(msg:match(gzmagic)and "\r\nContent-Encoding: gzip" or "").."\r\nConnection: close\r\nContent-Length: "..(len or #msg).."\r\n\r\n"..msg)
+  end
   local wsdec,wsenc=function(c)
     if #c<2 then return end
     local second=c:byte(2)
