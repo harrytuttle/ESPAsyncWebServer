@@ -13,24 +13,10 @@ local wsdec,wsenc=function(c)
   if #c < 2 then return end
   local second = byte(c, 2)
   local len = band(second, 0x7f)
-  local offset
-  if len == 126 then
-    if #c < 4 then return end
-    len = bor(
-      lshift(byte(c, 3), 8),
-      byte(c, 4))
-    offset = 4
-  elseif len == 127 then
-    if #c < 10 then return end
-    len = bor(
-      -- Ignore lengths longer than 32bit
-      lshift(byte(c, 7), 24),
-      lshift(byte(c, 8), 16),
-      lshift(byte(c, 9), 8),
-      byte(c, 10))
-    offset = 10
-  else
-    offset = 2
+  local offset = 2
+  if len==126 then
+    if #c<4 then return end
+    len,offset=bor(lshift(byte(c,3),8),byte(c,4)),4
   end
   local mask = band(second, 0x80) > 0
   if mask then offset = offset + 4 end
