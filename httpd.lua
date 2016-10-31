@@ -33,17 +33,11 @@ local wsdec,wsenc=function(c)
     offset = 2
   end
   local mask = band(second, 0x80) > 0
-  if mask then
-    offset = offset + 4
-  end
+  if mask then offset = offset + 4 end
   if #c < offset + len then return end
-
-  local first = byte(c, 1)
-  local payload = sub(c, offset + 1, offset + len)
-  assert(#payload == len, "Length mismatch")
-  if mask then
-    payload = applyMask(payload, sub(c, offset - 3, offset))
-  end
+  local first,payload = byte(c,1),sub(c, offset + 1, offset + len)
+  assert(#payload == len, "len bad")
+  if mask then payload = applyMask(payload, sub(c, offset - 3, offset))end
   local extra = sub(c, offset + len + 1)
   local opcode = band(first, 0xf)
   return extra, payload, opcode
