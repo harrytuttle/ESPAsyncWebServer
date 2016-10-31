@@ -48,6 +48,7 @@ local wsdec,wsenc=function(c)
   local opcode = band(first, 0xf)
   return extra, payload, opcode
 end,function(msg)--opcode 0x1 is string, 0x9 is ping, 0xA is pong, 0x80 is FIN, mask is always 0
+  if not msg then return string.char(bit.bor(0x80,0xA),0)end
   local len = #msg
   local head = char(
     bor(0x80, 0x1),
