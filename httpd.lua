@@ -35,6 +35,7 @@ return function(port,pwd,wscb)
   local bcast=function(s)for _,v in pairs(websockets)do v:send(wsenc(s))end end
   net.createServer(net.TCP,61):listen(port or 80,function(c)
     c:on("receive",function(c,r)
+      local url,hdrs,body=r:match("^%w- /(.-) HTTP/1.-\r\n(.-)\r\n\r\n(.*)")
     end)
     c:on("disconnection",function(c)websockets[c]=nil end)
   end)
