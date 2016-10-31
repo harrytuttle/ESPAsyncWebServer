@@ -9,7 +9,7 @@ return function(port,pwd,wscb)
     c:on("sent",function(c)if file.seek()<len then c:send(file.read(1024))end end)
     reply(c,file.read(512)or "",typ,len)
   end
-  local wsdec,wsenc=function(c)
+  local wsdec,wscb=wscb and function(c)
     if #c<2 then return end
     local second=c:byte(2)
     local len,offset=bit.band(second,0x7f),2
