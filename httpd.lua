@@ -9,7 +9,7 @@ local applyMask = crypto.mask
 local toBase64 = crypto.toBase64
 local sha1 = crypto.sha1
 
-local function decode(chunk)
+local wsdec,wsenc=function(chunk)
   if #chunk < 2 then return end
   local second = byte(chunk, 2)
   local len = band(second, 0x7f)
@@ -47,9 +47,7 @@ local function decode(chunk)
   local extra = sub(chunk, offset + len + 1)
   local opcode = band(first, 0xf)
   return extra, payload, opcode
-end
-
-local function encode(payload, opcode)
+end,function(payload, opcode)
   opcode = opcode or 2
   assert(type(opcode) == "number", "opcode must be number")
   assert(type(payload) == "string", "payload must be string")
