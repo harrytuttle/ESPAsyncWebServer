@@ -45,6 +45,10 @@ return function(port,pwd,wscb)
       elseif url:match("^edit")then
         if hdrs:match("Authorization: Basic (.-)\r")~=crypto.toBase64("admin:"..(pwd or "")) then return reply(c,"401",'text/html\r\nWWW-Authenticate: Basic realm="Login"')end
         local cmd,arg=url:gsub('%%(%x%x)',function(h)return string.char(tonumber(h,16))end):match("?(%w+)=/(.*)")
+        if cmd=="list" then local list={}table.foreach(file.list(),function(f,s)table.insert(list,{size=s,name=f})end)return reply(c,cjson.encode(list),"application/json")end
+        if cmd=="run" then node.output(function(s)node.output(reply(c,s))end,0)return node.input(arg)end
+        if cmd=="download" then return serve(c,arg,"application/octet-stream\r\nContent-Disposition: attachment; filename='"..(arg:match("www/(.*)") or arg).."';")end
+        if cmd=="edit" then return serve(c,arg)end
       end
     end)
     c:on("disconnection",function(c)websockets[c]=nil end)
