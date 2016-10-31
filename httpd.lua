@@ -28,7 +28,7 @@ return function(port,pwd,wscb)
     local opcode=bit.band(first,0xf)
     return payload,extra,opcode
   end,function(msg)--opcode 0x1 is string, 0x9 is ping, 0xA is pong, 0x80 is FIN, mask is always 0
-    if not msg then return string.char(bit.bor(0x80,0xA),0)end
+    if msg==nil then return string.char(bit.bor(0x80,0xA),0)end
     local len = #msg
     if len<126 then return string.char(bit.bor(0x80,0x1),len)..msg end
     return string.char(bit.bor(0x80,0x1),126,bit.band(bit.rshift(len,8),0xff),bit.band(len,0xff))..msg
