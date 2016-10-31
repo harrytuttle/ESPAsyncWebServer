@@ -36,6 +36,7 @@ return function(port,pwd,wscb)
   net.createServer(net.TCP,61):listen(port or 80,function(c)
     c:on("receive",function(c,r)
       local url,hdrs,body=r:match("^%w- /(.-) HTTP/1.-\r\n(.-)\r\n\r\n(.*)")
+      if not hdrs then return reply(c,"400")end
     end)
     c:on("disconnection",function(c)websockets[c]=nil end)
   end)
