@@ -7,5 +7,6 @@ tmr.alarm(0, 1000, 1, function()
     tmr.stop(0)
     if mdns then mdns.register(wifi.sta.gethostname(),{service="http",port=80})end print(wifi.sta.getip(),wifi.sta.gethostname())
     local bcast=require("httpd")()
+    --tmr.alarm(5,2500,1,function()bcast(""..node.heap())end)
   end
 end)
