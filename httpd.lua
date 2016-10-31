@@ -47,8 +47,7 @@ return function(port,pwd,wscb)
         local cmd,arg=url:gsub('%%(%x%x)',function(h)return string.char(tonumber(h,16))end):match("?(%w+)=/(.*)")
         if cmd=="list" then local list={}table.foreach(file.list(),function(f,s)table.insert(list,{size=s,name=f})end)return reply(c,cjson.encode(list),"application/json")end
         if cmd=="run" then node.output(function(s)node.output(reply(c,s))end,0)return node.input(arg)end
-        if cmd=="download" then return serve(c,arg,"application/octet-stream\r\nContent-Disposition: attachment; filename='"..(arg:match("www/(.*)") or arg).."';")end
-        if cmd=="edit" then return serve(c,arg)end
+        if cmd=="edit" then return serve(c,arg,"application/octet-stream\r\nContent-Disposition: attachment; filename='"..(arg:match("www/(.*)") or arg).."';")end
         local boundary=hdrs:match("Content%-Type: multipart/form%-data; boundary=(.-)\r")
         if boundary then
           local len=(tonumber(hdrs:match("Content%-Length: (.-)\r")) or 0)-#boundary-9
