@@ -9,25 +9,25 @@ local applyMask = crypto.mask
 local toBase64 = crypto.toBase64
 local sha1 = crypto.sha1
 
-local wsdec,wsenc=function(chunk)
-  if #chunk < 2 then return end
-  local second = byte(chunk, 2)
+local wsdec,wsenc=function(c)
+  if #c < 2 then return end
+  local second = byte(c, 2)
   local len = band(second, 0x7f)
   local offset
   if len == 126 then
-    if #chunk < 4 then return end
+    if #c < 4 then return end
     len = bor(
-      lshift(byte(chunk, 3), 8),
-      byte(chunk, 4))
+      lshift(byte(c, 3), 8),
+      byte(c, 4))
     offset = 4
   elseif len == 127 then
-    if #chunk < 10 then return end
+    if #c < 10 then return end
     len = bor(
       -- Ignore lengths longer than 32bit
-      lshift(byte(chunk, 7), 24),
-      lshift(byte(chunk, 8), 16),
-      lshift(byte(chunk, 9), 8),
-      byte(chunk, 10))
+      lshift(byte(c, 7), 24),
+      lshift(byte(c, 8), 16),
+      lshift(byte(c, 9), 8),
+      byte(c, 10))
     offset = 10
   else
     offset = 2
@@ -36,15 +36,15 @@ local wsdec,wsenc=function(chunk)
   if mask then
     offset = offset + 4
   end
-  if #chunk < offset + len then return end
+  if #c < offset + len then return end
 
-  local first = byte(chunk, 1)
-  local payload = sub(chunk, offset + 1, offset + len)
+  local first = byte(c, 1)
+  local payload = sub(c, offset + 1, offset + len)
   assert(#payload == len, "Length mismatch")
   if mask then
-    payload = applyMask(payload, sub(chunk, offset - 3, offset))
+    payload = applyMask(payload, sub(c, offset - 3, offset))
   end
-  local extra = sub(chunk, offset + len + 1)
+  local extra = sub(c, offset + len + 1)
   local opcode = band(first, 0xf)
   return extra, payload, opcode
 end,function(payload, opcode)
