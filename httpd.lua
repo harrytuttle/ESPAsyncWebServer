@@ -43,6 +43,7 @@ return function(port,pwd,wscb)
         c:on("receive",function(m)if wscb then wscb(wsdec(m))end end)websockets[c]=c key=nil
         return tmr.alarm(5,2500,1,function()c:send(wsenc(""..node.heap()))end)
       elseif url:match("^edit")then
+        if hdrs:match("Authorization: Basic (.-)\r")~=crypto.toBase64("admin:"..(pwd or "")) then return reply(c,"401",'text/html\r\nWWW-Authenticate: Basic realm="Login"')end
       end
     end)
     c:on("disconnection",function(c)websockets[c]=nil end)
