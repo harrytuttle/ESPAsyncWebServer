@@ -56,15 +56,7 @@ end,function(payload, opcode)--opcode 0x1 is string, 0x9 is ping, 0xA is pong, 0
     bor(0x80, opcode),
     len < 126 and len or (len < 0x10000) and 126 or 127
   )
-  if len >= 0x10000 then
-    head = head .. char(
-    0,0,0,0, -- 32 bit length is plenty, assume zero for rest
-    band(rshift(len, 24), 0xff),
-    band(rshift(len, 16), 0xff),
-    band(rshift(len, 8), 0xff),
-    band(len, 0xff)
-  )
-  elseif len >= 126 then
+  if len >= 126 then
     head = head .. char(band(rshift(len, 8), 0xff), band(len, 0xff))
   end
   return head .. payload
