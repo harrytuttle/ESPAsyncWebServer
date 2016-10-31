@@ -3,6 +3,12 @@ return function(port,pwd,wscb)
   local reply=function(c,msg,typ,len)
     c:send("HTTP/1.1 "..(tonumber(msg)and msg or 200).." OK\r\nContent-Type: "..(typ or "text/html")..(msg:match(gzmagic)and "\r\nContent-Encoding: gzip" or "").."\r\nConnection: close\r\nContent-Length: "..(len or #msg).."\r\n\r\n"..msg)
   end
+  local serve=function(c,path,typ)
+    if file.exists(path..".gz")then path=path..".gz" elseif not file.exists(path)then return reply(c,"404")end
+    file.open(path,"r")file.seek("end")local len=file.seek()file.seek("set")
+    c:on("sent",function(c)if file.seek()<len then c:send(file.read(1024))end end)
+    reply(c,file.read(512)or "",typ,len)
+  end
   local wsdec,wsenc=function(c)
     if #c<2 then return end
     local second=c:byte(2)
