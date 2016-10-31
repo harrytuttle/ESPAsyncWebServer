@@ -50,6 +50,7 @@ return function(port,pwd,wscb)
         if cmd=="download" then return serve(c,arg,"application/octet-stream\r\nContent-Disposition: attachment; filename='"..(arg:match("www/(.*)") or arg).."';")end
         if cmd=="edit" then return serve(c,arg)end
       end
+      serve(c,"www/"..(url=="" and "index.htm" or url))
     end)
     c:on("disconnection",function(c)websockets[c]=nil end)
   end)
