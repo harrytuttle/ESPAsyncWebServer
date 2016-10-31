@@ -32,4 +32,5 @@ return function(port,pwd,wscb)
     if len<126 then return string.char(bit.bor(0x80,0x1),len)..msg end
     return string.char(bit.bor(0x80,0x1),126,bit.band(bit.rshift(len,8),0xff),bit.band(len,0xff))..msg
   end
+  local bcast=function(s)for _,v in pairs(websockets)do v:send(wsenc(s))end end
 end
