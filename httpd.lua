@@ -33,4 +33,10 @@ return function(port,pwd,wscb)
     return string.char(bit.bor(0x80,0x1),126,bit.band(bit.rshift(len,8),0xff),bit.band(len,0xff))..msg
   end
   local bcast=function(s)for _,v in pairs(websockets)do v:send(wsenc(s))end end
+  net.createServer(net.TCP,61):listen(port or 80,function(c)
+    c:on("receive",function(c,r)
+    end)
+    c:on("disconnection",function(c)websockets[c]=nil end)
+  end)
+  return bcast
 end
