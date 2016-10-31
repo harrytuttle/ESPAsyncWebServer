@@ -47,7 +47,7 @@ local wsdec,wsenc=function(c)
   local extra = sub(c, offset + len + 1)
   local opcode = band(first, 0xf)
   return extra, payload, opcode
-end,function(payload, opcode)
+end,function(payload, opcode)--opcode 0x1 is string, 0x9 is ping, 0xA is pong, 0x80 is FIN, mask is always 0
   opcode = opcode or 2
   assert(type(opcode) == "number", "opcode must be number")
   assert(type(payload) == "string", "payload must be string")
