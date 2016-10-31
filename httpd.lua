@@ -49,8 +49,6 @@ local wsdec,wsenc=function(c)
   return extra, payload, opcode
 end,function(msg, opcode)--opcode 0x1 is string, 0x9 is ping, 0xA is pong, 0x80 is FIN, mask is always 0
   opcode = opcode or 2
-  assert(type(opcode) == "number", "opcode must be number")
-  assert(type(msg) == "string", "msg must be string")
   local len = #msg
   local head = char(
     bor(0x80, opcode),
