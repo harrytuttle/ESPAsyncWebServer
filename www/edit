@@ -352,7 +352,7 @@ function createTree(element, editor){
     var leaf = ce("li");
     leaf.id = (((path == "/")?"":path)+"/"+name);
     var label = ce("span");
-    label.innerHTML = name;
+    label.innerHTML = name+" ("+size+")";
     leaf.appendChild(label);
     leaf.onclick = function(e){
       if(isTextFile(leaf.id.toLowerCase())){
