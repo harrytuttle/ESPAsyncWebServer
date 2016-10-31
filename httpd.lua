@@ -1,4 +1,5 @@
 return function(port,pwd,wscb)
+  local websockets,gzmagic={},string.char(0x5e,0x1f,0x8b)
   local wsdec,wsenc=function(c)
     if #c<2 then return end
     local second=c:byte(2)
