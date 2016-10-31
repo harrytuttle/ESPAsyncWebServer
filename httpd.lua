@@ -38,6 +38,11 @@ return function(port,pwd,wscb)
       local url,hdrs,body=r:match("^%w- /(.-) HTTP/1.-\r\n(.-)\r\n\r\n(.*)")
       if not hdrs then return reply(c,"400")end
       local key=hdrs:match("Sec%-WebSocket%-Key: (.-)\r")
+      if key then
+        c:send("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "..crypto.toBase64(crypto.sha1(key.."258EAFA5-E914-47DA-95CA-C5AB0DC85B11")).."\r\n\r\n"..wsenc("hello"))
+        c:on("receive",function(m)if wscb then wscb(wsdec(m))end end)websockets[c]=c key=nil
+        return tmr.alarm(5,2500,1,function()c:send(wsenc(""..node.heap()))end)
+      end
     end)
     c:on("disconnection",function(c)websockets[c]=nil end)
   end)
