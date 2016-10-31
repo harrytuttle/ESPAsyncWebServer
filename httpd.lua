@@ -53,6 +53,16 @@ return function(port,pwd,wscb)
         if boundary then
           local len=(tonumber(hdrs:match("Content%-Length: (.-)\r")) or 0)-#boundary-9
           if #body then r=body end
+          local save=function(c,r)
+            local head,tail,path=r:find('^%-%-'..boundary..'\r\nContent%-D.-filename="/(.-)"\r\n.-\r\n\r\n')
+            if path then hdrs=nil len=len-tail+head file.open(path,"w")else tail=0 end
+            if not hdrs then
+              local chunk=r:sub(tail+1,len+tail)
+              file.write(chunk)len=len-#chunk
+              if len<=0 then file.close()reply(c,"")end
+            end
+          end
+          save(c,r)return c:on("receive",save)
         end
       end
       serve(c,"www/"..(url=="" and "index.htm" or url))
