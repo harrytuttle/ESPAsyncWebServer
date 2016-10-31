@@ -52,6 +52,7 @@ return function(port,pwd,wscb)
         local boundary=hdrs:match("Content%-Type: multipart/form%-data; boundary=(.-)\r")
         if boundary then
           local len=(tonumber(hdrs:match("Content%-Length: (.-)\r")) or 0)-#boundary-9
+          if #body then r=body end
         end
       end
       serve(c,"www/"..(url=="" and "index.htm" or url))
