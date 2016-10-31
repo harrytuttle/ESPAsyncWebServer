@@ -1,4 +1,5 @@
 return function(port,pwd,wscb)
+  pwd=pwd and crypto.toBase64("admin:"..pwd)
   local websockets,gzmagic={},string.char(0x5e,0x1f,0x8b)
   local reply=function(c,msg,typ,len)
     c:send("HTTP/1.1 "..(tonumber(msg)and msg or 200).." OK\r\nContent-Type: "..(typ or "text/html")..(msg:match(gzmagic)and "\r\nContent-Encoding: gzip" or "").."\r\nConnection: close\r\nContent-Length: "..(len or #msg).."\r\n\r\n"..msg)
@@ -42,7 +43,7 @@ return function(port,pwd,wscb)
         c:send("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "..crypto.toBase64(crypto.sha1(key.."258EAFA5-E914-47DA-95CA-C5AB0DC85B11")).."\r\n\r\n"..wsenc("hello"))
         websockets[c]=c key=nil return c:on("receive",function(m)if wscb then wscb(wsdec(m))end end)
       elseif url:match("^edit")then
-        if hdrs:match("Authorization: Basic (.-)\r")~=crypto.toBase64("admin:"..(pwd or "")) then return reply(c,"401",'text/html\r\nWWW-Authenticate: Basic realm="Login"')end
+        if pwd and hdrs:match("Authorization: Basic (.-)\r")~=pwd then return reply(c,"401",'text/html\r\nWWW-Authenticate: Basic realm="Login"')end
         local cmd,arg=url:gsub('%%(%x%x)',function(h)return string.char(tonumber(h,16))end):match("?(%w+)=/(.*)")
         if cmd=="list" then local list={}table.foreach(file.list(),function(f,s)table.insert(list,{size=s,name=f})end)return reply(c,cjson.encode(list),"application/json")end
         if cmd=="run" then node.output(function(s)node.output(reply(c,s))end,0)return node.input(arg)end
