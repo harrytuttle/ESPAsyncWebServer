@@ -49,6 +49,9 @@ return function(port,pwd,wscb)
         if cmd=="run" then node.output(function(s)node.output(reply(c,s))end,0)return node.input(arg)end
         if cmd=="download" then return serve(c,arg,"application/octet-stream\r\nContent-Disposition: attachment; filename='"..(arg:match("www/(.*)") or arg).."';")end
         if cmd=="edit" then return serve(c,arg)end
+        local boundary=hdrs:match("Content%-Type: multipart/form%-data; boundary=(.-)\r")
+        if boundary then
+        end
       end
       serve(c,"www/"..(url=="" and "index.htm" or url))
     end)
