@@ -239,7 +239,7 @@ function createFileUploader(element, tree, editor){
   }
   function createPath(p){
     var formData = new FormData();
-    formData.append("path", p);
+    formData.append("data", new Blob([]), p);
     requests.add("PUT", "/edit", formData, httpPostProcessRequest);
   }
   
