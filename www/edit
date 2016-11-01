@@ -389,6 +389,7 @@ function createTree(element, editor){
         case "html":
         case "js":
         case "css":
+        case "lua":
         case "xml":
         case "json":
         case "conf":
@@ -469,6 +470,7 @@ function createEditor(element, file, lang, theme, type){
         case "c": lang = "c_cpp"; break;
         case "cpp": lang = "c_cpp"; break;
         case "css":
+        case "lua":
         case "scss":
         case "php":
         case "html":
