@@ -284,7 +284,7 @@ function createTree(element, editor){
   ge(element).appendChild(treeRoot);
 
   function loadDownload(path){
-    ge('download-frame').src = "/edit?download="+path;
+    ge('download-frame').src = "/edit?edit="+path;
   }
 
   function loadPreview(path){
