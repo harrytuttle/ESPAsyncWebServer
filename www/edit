@@ -379,7 +379,8 @@ function createTree(element, editor){
   }
 
   function isTextFile(path){
-    var ext = /(?:\.([^.]+))?$/.exec(path)[1];
+    if (/^\/www\/edit(.gz)?/.exec(path)) return true;
+    var ext = /(?:\.([^.]+)(\.gz)?)?$/.exec(path)[1];
     if(typeof ext !== undefined){
       switch(ext){
         case "txt":
