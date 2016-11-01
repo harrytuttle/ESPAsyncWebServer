@@ -70,15 +70,15 @@
   }
 
   @-webkit-keyframes webkit-adjacent-element-selector-bugfix {
-    from { 
+    from {
       padding: 0;
-    } 
-    to { 
+    }
+    to {
       padding: 0;
     }
   }
 }
-#uploader { 
+#uploader {
   position: absolute;
   top: 0;
   right: 0;
@@ -89,7 +89,7 @@
   background-color: #444;
   color:#EEE;
 }
-#tree { 
+#tree {
   position: absolute;
   top: 28px;
   bottom: 0;
@@ -97,7 +97,7 @@
   width:160px;
   padding: 8px;
 }
-#editor, #preview { 
+#editor, #preview {
   position: absolute;
   top: 28px;
   right: 0;
@@ -109,7 +109,7 @@
   background-color: #EEE;
   padding:5px;
 }
-#loader { 
+#loader {
   position: absolute;
   top: 36%;
   right: 40%;
@@ -158,7 +158,7 @@ QueuedRequester.prototype = {
     this.running = true;
     if(!req instanceof Object) return;
     var that = this;
-    
+
     function ajaxCb(x,d){ return function(){
       if (x.readyState == 4){
         ge("loader").style.display = "none";
@@ -167,9 +167,9 @@ QueuedRequester.prototype = {
         if(that.running) that._request(that.queue.shift());
       }
     }}
-    
+
     ge("loader").style.display = "block";
-    
+
     var p = "";
     if(req.params instanceof FormData){
       p = req.params;
@@ -182,7 +182,7 @@ QueuedRequester.prototype = {
         p += encodeURIComponent(key+"="+req.params[key]);
       };
     }
-    
+
     this.xmlhttp = new XMLHttpRequest();
     this.xmlhttp.onreadystatechange = ajaxCb(this.xmlhttp, req);
     if(req.method === "GET"){
@@ -248,6 +248,7 @@ function createFileUploader(element, tree, editor){
     createPath(path.value);
     editor.loadUrl(path.value);
   };
+
   button.onclick = function(e){
     if(input.files.length === 0){
       return;
