@@ -374,7 +374,7 @@ function createTree(element, editor){
     parent.appendChild(list);
     var ll = items.length;
     for(var i = 0; i < ll; i++){
-      if(items[i].type === "file")
+      if(items[i].type === "file" || items[i].type === undefined)
         list.appendChild(createTreeLeaf(path, items[i].name, items[i].size));
     }
 
