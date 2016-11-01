@@ -312,6 +312,15 @@ function createTree(element, editor){
         if(document.body.getElementsByClassName('cm').length > 0) document.body.removeChild(el);
       };
     }
+    if (/\.lua$/.exec(path)){
+      var action = ce("li");
+      list.appendChild(action);
+      action.innerHTML = "<span>Compile</span>";
+      action.onclick = function(e){
+        httpCompile(path);
+        if(document.body.getElementsByClassName('cm').length > 0) document.body.removeChild(el);
+      };
+    }
     var download = ce("li");
     list.appendChild(download);
     download.innerHTML = "<span>Download</span>";
@@ -433,10 +442,12 @@ function createTree(element, editor){
     }
   }
 
-  function httpDelete(filename){
-    var formData = new FormData();
-    formData.append("path", filename);
-    requests.add("DELETE", "/edit", formData, delCb(filename));
+  function httpDelete(path){
+    requests.add("GET", "/edit", {run: "/file.remove('"+path.substr(1)+"')"}, delCb(path));
+  }
+
+  function httpCompile(path){
+    requests.add("GET", "/edit", {run: "/node.compile('"+path.substr(1)+"')"}, delCb(path));
   }
 
   function getCb(parent, path){
