@@ -294,47 +294,27 @@ function createTree(element, editor){
     preview.innerHTML = '<img src="/edit?edit='+path+'&_cb='+Date.now()+'" style="max-width:100%; max-height:100%; margin:auto; display:block;" />';
   }
 
+  function addAction(list, path, name, func){
+    var action = ce("li");
+    list.appendChild(action);
+    action.innerHTML = "<span>"+name+"</span>";
+    action.onclick = function(e){
+      func(path);
+      if(document.body.getElementsByClassName('cm').length > 0) document.body.removeChild(list.parentNode);
+    };
+  }
+
   function fillFileMenu(el, path){
     var list = ce("ul");
     el.appendChild(list);
-    var action = ce("li");
-    list.appendChild(action);
-    if(isImageFile(path)){
-      action.innerHTML = "<span>Preview</span>";
-      action.onclick = function(e){
-        loadPreview(path);
-        if(document.body.getElementsByClassName('cm').length > 0) document.body.removeChild(el);
-      };
-    } else if(isTextFile(path)){
-      action.innerHTML = "<span>Edit</span>";
-      action.onclick = function(e){
-        editor.loadUrl(path);
-        if(document.body.getElementsByClassName('cm').length > 0) document.body.removeChild(el);
-      };
-    }
-    if (/\.lua$/.exec(path)){
-      var action = ce("li");
-      list.appendChild(action);
-      action.innerHTML = "<span>Compile</span>";
-      action.onclick = function(e){
-        httpCompile(path);
-        if(document.body.getElementsByClassName('cm').length > 0) document.body.removeChild(el);
-      };
-    }
-    var download = ce("li");
-    list.appendChild(download);
-    download.innerHTML = "<span>Download</span>";
-    download.onclick = function(e){
-      loadDownload(path);
-      if(document.body.getElementsByClassName('cm').length > 0) document.body.removeChild(el);
-    };
-    var delFile = ce("li");
-    list.appendChild(delFile);
-    delFile.innerHTML = "<span>Delete</span>";
-    delFile.onclick = function(e){
-      httpDelete(path);
-      if(document.body.getElementsByClassName('cm').length > 0) document.body.removeChild(el);
-    };
+    if(isImageFile(path))
+      addAction(list, path, "Preview", loadPreview);
+    else if(isTextFile(path))
+      addAction(list, path, "Edit", editor.loadUrl);
+    if (/\.lua$/.exec(path))
+      addAction(list, path," Compile", httpCompile);
+    addAction(list, path, "Download", loadDownload);
+    addAction(list, path, "Delete", httpDelete);
   }
 
   function showContextMenu(event, path, isfile){
