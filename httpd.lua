@@ -1,6 +1,6 @@
 return function(port,pwd,wscb)
   pwd=pwd and crypto.toBase64("admin:"..pwd)
-  local websockets,reply={},function(c,msg,typ,len)
+  local reply=function(c,msg,typ,len)
     c:send("HTTP/1.1 "..(tonumber(msg)and msg or 200).." OK\r\nContent-Type: "..(typ or "text/html")..(msg:match("^\31\139")and "\r\nContent-Encoding: gzip" or "").."\r\nConnection: close\r\nContent-Length: "..(len or #msg).."\r\n\r\n"..msg)
   end
   local serve=function(c,path,typ)
@@ -9,7 +9,7 @@ return function(port,pwd,wscb)
     c:on("sent",function(c)if cur<len then file.open(path)cur=256+file.seek("set",cur)c:send(file.read(256))end end)
     reply(c,file.read(256)or "",typ,len)
   end
-  local wsdec,wsenc=wscb and function(c)
+  local wsdec,wsenc,websockets=wscb and function(c)
     if #c<2 then return end
     local second=c:byte(2)
     local len,offset=bit.band(second,0x7f),2
@@ -29,14 +29,14 @@ return function(port,pwd,wscb)
     local len=#msg
     if len<126 then return string.char(bit.bor(0x80,0x1),len)..msg end
     return string.char(bit.bor(0x80,0x1),126,bit.band(bit.rshift(len,8),0xff),bit.band(len,0xff))..msg
-  end
+  end,{}
   local bcast=function(s)for _,v in pairs(websockets)do v:send(wsenc(s))end end
   net.createServer(net.TCP,61):listen(port or 80,function(c)
     c:on("receive",function(c,r)
       local url,hdrs,body=r:match("^%w- /(.-) HTTP/1.-\r\n(.-)\r\n\r\n(.*)")
       if not hdrs then return reply(c,"400")end
       local key=hdrs:match("Sec%-WebSocket%-Key: (.-)\r")
-      if key then
+      if key and wsenc then
         c:send("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "..crypto.toBase64(crypto.sha1(key.."258EAFA5-E914-47DA-95CA-C5AB0DC85B11")).."\r\n\r\n"..wsenc("hello"))
         websockets[c]=c key=nil return c:on("receive",function(m)return wcsb and wscb(wsdec(m))end)
       elseif url:match("^edit")then
