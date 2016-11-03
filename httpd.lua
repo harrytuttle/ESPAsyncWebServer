@@ -1,8 +1,7 @@
 return function(port,pwd,wscb)
   pwd=pwd and crypto.toBase64("admin:"..pwd)
-  local websockets,gzmagic={},string.char(0x5e,0x1f,0x8b)
-  local reply=function(c,msg,typ,len)
-    c:send("HTTP/1.1 "..(tonumber(msg)and msg or 200).." OK\r\nContent-Type: "..(typ or "text/html")..(msg:match(gzmagic)and "\r\nContent-Encoding: gzip" or "").."\r\nConnection: close\r\nContent-Length: "..(len or #msg).."\r\n\r\n"..msg)
+  local websockets,reply={},function(c,msg,typ,len)
+    c:send("HTTP/1.1 "..(tonumber(msg)and msg or 200).." OK\r\nContent-Type: "..(typ or "text/html")..(msg:match("^\31\139")and "\r\nContent-Encoding: gzip" or "").."\r\nConnection: close\r\nContent-Length: "..(len or #msg).."\r\n\r\n"..msg)
   end
   local serve=function(c,path,typ)
     if file.open(path..".gz")then path=path..".gz" elseif not file.open(path)then return reply(c,"404")end
