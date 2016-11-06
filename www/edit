@@ -130,6 +130,14 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+#termleft,#termright{
+  position:absolute;
+  bottom:300px;
+  z-index:99;
+}
+#termright{
+  right:600px;
+}
 </style>
 <script>
 if (typeof XMLHttpRequest === "undefined") {
@@ -230,6 +238,17 @@ function createFileUploader(element, tree, editor){
   var mkfile = ce("button");
   mkfile.innerHTML = 'Create';
   ge(element).appendChild(mkfile);
+  var restart = ce("button");
+  restart.innerHTML = 'Restart';
+  ge(element).appendChild(restart);
+  var shell = ce("button");
+  shell.innerHTML = 'REPL';
+  shell.id="Shell";
+  ge(element).appendChild(shell);
+  var serial = ce("button");
+  serial.innerHTML = 'Serial';
+  serial.id="Serial";
+  ge(element).appendChild(serial);
 
   function httpPostProcessRequest(status, responseText){
     if(status != 200)
@@ -241,6 +260,38 @@ function createFileUploader(element, tree, editor){
     var formData = new FormData();
     formData.append("data", new Blob([]), p);
     requests.add("PUT", "/edit", formData, httpPostProcessRequest);
+  }
+
+  restart.onclick = function(e){
+    requests.add("GET", "/edit", {run:"/tmr.alarm(5,250,1,node.restart)"}, httpPostProcessRequest);
+  }
+
+  shell.onclick = function(e){
+    switch(Shell.style.borderStyle){
+      case "inset":Shell.style.borderStyle="outset";termleft.hidden=true;break;
+      case "outset":Shell.style.borderStyle="inset";termleft.hidden=false;break;
+      default:
+        termleft.hidden=false;
+        Shell.style.borderStyle="inset";
+        var repl=new Terminal(15,80,"> ");
+        repl.open(termleft);
+        repl.on(function(cmd){
+          requests.add("GET","/edit",{run:"/"+cmd},function(status,msg){if(status==200)repl.write(msg);});
+        });
+    }
+  }
+
+  serial.onclick = function(e){
+    switch(Serial.style.borderStyle){
+      case "inset":Serial.style.borderStyle="outset";termright.hidden=true;uart.blur();break;
+      case "outset":Serial.style.borderStyle="inset";termright.hidden=false;uart.focus();break;
+      default:
+        termright.hidden=false;
+        Serial.style.borderStyle="inset";
+        uart=new Terminal(15,80);
+        uart.open(termright);
+        uart.on(function(d){console.log(d)});
+    }
   }
   
   mkfile.onclick = function(e){
@@ -555,6 +606,58 @@ function onBodyLoad(){
   var tree = createTree("tree", editor);
   createFileUploader("uploader", tree, editor);
 };
+function Terminal(rows, cols, prompt) {
+  prompt=prompt || "";
+  var rl=[""];
+  var rlidx=0;
+  var callback=function(){};
+  this.on=function(f){callback=f;};
+  this.open=function(el){
+    var terminal=document.createElement("div");
+    terminal.style="position:relative;";
+    el.appendChild(terminal);
+    var past=document.createElement("textarea");
+    past.className="past";
+    past.disabled=true;
+    past.cols=cols;
+    past.rows=rows;
+    //past.spellcheck=false;//autocomplete,autocorrect,autocapitalize
+    past.value="\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+prompt;
+    past.style="position:absolute;resize:none;outline:none;overflow:hidden;font-size:12px;word-break:break-all;";
+    terminal.appendChild(past);
+    past.scrollTop = past.scrollHeight;
+    var readline=document.createElement("textarea");
+    readline.className="readline";
+    readline.disabled=false;
+    readline.cols=cols-prompt.length;
+    readline.rows=1;
+    readline.spellcheck=false;//autocomplete,autocorrect,autocapitalize
+    readline.style="border:none;position:absolute;padding-left:"+(8*prompt.length)+"px;font-size:12px;padding-top:"+(14.2*(rows-1))+"px;resize:none;outline:none;overflow:hidden;background-color:transparent;white-space:nowrap;";
+    terminal.appendChild(readline);
+    terminal.onmouseenter=function(e){readline.focus();}
+    terminal.onmouseleave=function(e){readline.blur();}
+    var write=function(msg){
+      past.value=past.value+msg+"\n"+prompt;
+      past.scrollTop=past.scrollHeight;
+      return msg;
+    }
+    this.write=write;
+    readline.onkeydown=function(e){
+      switch (e.which){
+        case 13: write(this.value);
+                 callback(this.value);
+                 if(this.value.trim()!=""){rl[0]=this.value;rlidx=0;rl.unshift("");};
+                 this.value="";
+                 return false;
+        case 38:
+        case 40: rlidx=Math.min(rl.length-1,Math.max(0,rlidx+39-e.which));
+                 readline.value=rl[rlidx];
+                 return false;
+        //default:console.log(e.which);
+      }
+    }
+  }
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js" type="text/javascript" charset="utf-8"></script>
 </head>
@@ -564,6 +667,8 @@ function onBodyLoad(){
   <div id="tree"></div>
   <div id="editor"></div>
   <div id="preview" style="display:none;"></div>
+  <div hidden=true id="termleft"></div>
+  <div hidden=true id="termright"></div>
   <iframe id=download-frame style='display:none;'></iframe>
 </body>
 </html>
