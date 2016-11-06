@@ -22,8 +22,7 @@ return function(port,pwd,wscb)
     if #c<offset+len then return end
     local first,payload=c:byte(1),c:sub(offset+1,offset+len)
     assert(#payload==len,"bad len")
-    if mask then payload=crypto.mask(payload,c:sub(offset-3,offset))end
-    return payload--,c:sub(offset+len+1),bit.band(first,0xf)--extra,opcode
+    return mask and crypto.mask(payload,c:sub(offset-3,offset))or payload--,c:sub(offset+len+1),bit.band(first,0xf)--extra,opcode
   end,function(msg)--opcode 0x1 is string, 0x9 is ping, 0xA is pong, 0x80 is FIN, mask is always 0
     if msg==nil then return "\138\0"end--pong is string.char(bit.bor(0x80,0xA),0)
     local len=#msg
