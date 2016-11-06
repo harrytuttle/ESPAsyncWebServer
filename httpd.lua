@@ -36,7 +36,7 @@ return function(port,pwd,wscb)
       if not hdrs then return reply(c,"400")end
       local key=hdrs:match("Sec%-WebSocket%-Key: (.-)\r")
       if key and wsenc then
-        c:send("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "..crypto.toBase64(crypto.sha1(key.."258EAFA5-E914-47DA-95CA-C5AB0DC85B11")).."\r\n\r\n"..wsenc("hello"))
+        c:send("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "..crypto.toBase64(crypto.sha1(key.."258EAFA5-E914-47DA-95CA-C5AB0DC85B11")).."\r\n\r\n"..wsenc(wscb and wscb()))
         websockets[c]=c key=nil return c:on("receive",function(m)return wscb and wscb(wsdec(m))end)
       elseif url:match("^edit")then
         if pwd and hdrs:match("Authorization: Basic (.-)\r")~=pwd then return reply(c,"401",'text/html\r\nWWW-Authenticate: Basic realm="Login"')end
