@@ -1,4 +1,4 @@
-return function(port,pwd,wscb)
+return function(port,pwd,idx,wscb)
   pwd=pwd and crypto.toBase64("admin:"..pwd)
   local reply=function(c,msg,typ,len)
     c:send("HTTP/1.1 "..(tonumber(msg)and msg or 200).." OK\r\nContent-Type: "..(typ or "text/html")..(msg:match("^\31\139")and "\r\nContent-Encoding: gzip" or "").."\r\nConnection: close\r\nContent-Length: "..(len or #msg).."\r\n\r\n"..msg)
@@ -61,7 +61,7 @@ return function(port,pwd,wscb)
           save(c,r)return c:on("receive",save)
         end
       end
-      serve(c,"www/"..(url=="" and "index.htm" or url))
+      serve(c,"www/"..(url=="" and(idx or"index.htm")or url))
     end)
   end)
   return bcast
