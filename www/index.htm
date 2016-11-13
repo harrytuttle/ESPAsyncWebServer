@@ -66,8 +66,8 @@
       stb();
     }
     function startSocket(){
-      ws = new WebSocket('ws://'+document.location.host+'/ws',['arduino']);
-      ws.binaryType = "arraybuffer";
+      ws = new WebSocket('ws://'+document.location.host+'/ws'/*,['arduino']*/);
+      //ws.binaryType = "arraybuffer";
       ws.onopen = function(e){
         addMessage("Connected");
       };
@@ -118,7 +118,7 @@
     }
     function onBodyLoad(){
       startSocket();
-      startEvents();
+      //startEvents();
     }
     </script>
   </head>
