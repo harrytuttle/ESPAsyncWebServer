@@ -549,6 +549,8 @@ function createEditor(element, file, lang, theme, type){
   }
   function httpPost(filename, data, type){
     var formData = new FormData();
+    if (typeof pako !== "undefined" && filename.match("\.gz$"))
+      data=pako.gzip(data,{level:9});
     formData.append("data", new Blob([data], { type: type }), filename);
     requests.add("POST", "/edit", formData, httpPostProcessRequest);
   }
@@ -666,7 +668,8 @@ function Terminal(rows, cols, prompt) {
   }
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.3/pako_deflate.min.js"></script>
 </head>
 <body onload="onBodyLoad();">
   <div id="loader" class="loader"></div>
