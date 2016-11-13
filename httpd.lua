@@ -40,7 +40,7 @@ return function(port,pwd,idx,wscb)
         c:on("disconnection",function(c)websockets[c]=nil end)websockets[c]=c key=nil
         return c:on("receive",function(c,m)return wscb and wscb(wsdec(m))end)
       elseif url:match("^edit")then
-        if pwd and hdrs:match("Authorization: Basic (.-)\r")~=pwd then return reply(c,"401",'text/html\r\nWWW-Authenticate: Basic realm="Login"')end
+        if pwd and hdrs:match("Authorization: Basic ([%w+/=]+)")~=pwd then return reply(c,"401",'text/html\r\nWWW-Authenticate: Basic realm="Login"')end
         local cmd,arg=url:gsub('%%(%x%x)',function(h)return string.char(tonumber(h,16))end):match("?(%w+)=/(.*)")
         if cmd=="list" then return reply(c,cjson.encode(file.list()))end
         if cmd=="run" then node.output(function(s)node.output(reply(c,s))end,0)return node.input(arg)end
