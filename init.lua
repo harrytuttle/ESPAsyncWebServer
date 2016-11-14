@@ -1,8 +1,7 @@
 --wifi.setmode(wifi.STATION)wifi.sta.config("SSID","KEY")wifi.sta.autoconnect(1)
 local hostname,pwd=wifi.ap.getconfig()
 wifi.sta.sethostname(hostname)
-print("Trying ", wifi.sta.getconfig())
-print("waiting 1 second or tmr.stop(0)")
+print("Trying ", wifi.sta.getconfig(),"\n...wait 1 second or tmr.stop(0)")
 tmr.alarm(0, 1000, 1, function()
   if wifi.sta.getip() then
     tmr.stop(0)
