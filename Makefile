@@ -18,7 +18,7 @@ www/edit.min.htm: www/edit.htm www/style.min.css www/script.min.js
 	@awk 'BEGIN{css=0;js=0}/^<\/style>/{css=0}/^<\/script>/{js=0}{if(css+js==0)print}/^<style.*>/{css=1;while(getline<"www/style.min.css")print}/^<script>/{js=1;while(getline<"www/script.min.js")print}' "$<" > "$@"
 
 %.gz: %
-	@$(GZIP) -i1000 "$<"
+	@$(GZIP) "$<"
 
 %.lc: %.lua
 	@$(LUAC) "$@" "$<"
