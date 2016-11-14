@@ -420,8 +420,9 @@ function createTree(element, editor){
   function addList(parent, path, items){
     var list = ce("ul");
     parent.appendChild(list);
-    for(var name of Object.keys(items).sort())
-      list.appendChild(createTreeLeaf(path, name, items[name]));
+    var names=Object.keys(items).sort();
+    for(var name in names)
+      list.appendChild(createTreeLeaf(path, names[name], items[names[name]]));
   }
 
   function isTextFile(path){
