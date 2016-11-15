@@ -7,7 +7,7 @@ return function(port,pwd,idx,wscb)
     if file.open(path..".gz")then path=path..".gz" elseif not file.open(path)then return reply(c,"404")end
     local len,cur=file.seek("end"),256 file.seek("set")
     c:on("sent",function(c)if cur<len then file.open(path)cur=256+file.seek("set",cur)c:send(file.read(256))end end)
-    reply(c,file.read(256)or "",typ,len)
+    reply(c,len>0 and file.read(256)or"",typ,len)
   end
   local wsdec,wsenc,websockets=wscb and function(c)
     if #c<2 then return end
