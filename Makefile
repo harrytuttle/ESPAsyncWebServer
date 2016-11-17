@@ -27,8 +27,8 @@ www/edit.min.htm: www/edit.htm www/style.min.css www/script.min.js
 	@$(MINLUA) "$@" "$<"
 
 %.inc: %
-	@awk 'BEGIN{i=0;RS="";print "file.open(\"$<\",\"w\")_=file.write\n"}\
-{while (i<=length($$0)) print "_([==[",substr($$0,i+=255,255),"]==])"}\
+	@awk 'BEGIN{i=0;RS="";i=-255;print "file.open(\"$<\",\"w\")_=file.write"}\
+{while (i<=length($$0)) print "_([==[" substr($$0,i+=255,255) "]==])";}\
 END{print "file.close()_=nil"}' "$<" > "$@"
 
 clean:
