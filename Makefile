@@ -27,9 +27,10 @@ www/edit.min.htm: www/edit.htm www/style.min.css www/script.min.js
 	@$(MINLUA) "$@" "$<"
 
 %.inc: %
-	@awk 'BEGIN{i=0;RS="";i=-255;print "file.open(\"$<\",\"w\")_=file.write"}\
-{while (i<=length($$0)) print "_([==[" substr($$0,i+=255,255) "]==])";}\
-END{print "file.close()_=nil"}' "$<" > "$@"
+        @od -An -vtu1 -w60 "$<" | sed -e "s/^ */_(\"\\\/" -e "s/ *$$/\")/" -e "s/ \+/\\\/g" -e "1 i file.open('$<','w')_=file.write" -e "$$ a file.close()_=nil" > "$@"
+        @echo -n "Max line length: ";wc -L "$@"
+        @echo -n "Lines: "; wc -l "$@"
+        @echo -n "Size: ";wc -c "$@"
 
 clean:
 	@rm -f www/*.min.* www/*.gz www/*.inc *.min.* *.gz *.lc *.inc
