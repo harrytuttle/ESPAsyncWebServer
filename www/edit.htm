@@ -263,7 +263,7 @@ function createFileUploader(element, tree, editor){
   }
 
   restart.onclick = function(e){
-    requests.add("GET", "/edit", {run:"/tmr.alarm(5,250,1,node.restart)"}, httpPostProcessRequest);
+    requests.add("GET", "/edit", {run:"/tmr.create():alarm(250, tmr.ALARM_SINGLE, node.restart)"}, httpPostProcessRequest);
   }
 
   shell.onclick = function(e){
