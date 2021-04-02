@@ -92,6 +92,14 @@ substitute for the list cmd
 http://witty.lan/edit?run=/local%20list={}table.foreach(file.list(),function(f,s)table.insert(list,{size=s,name=f})end)return%20cjson.encode(list)  
 
 
+build a firmware
+```
+$ _v="";for m in ADC BIT CRYPTO DHT ENCODER FILE GPIO HTTP I2C MDNS MQTT NET NODE OW PWM RFSWITCH RTCMEM RTCTIME SJSON SNTP SPI TMR UART WEBSOCKET WIFI; do _v+="_${m}$\|" done &&\
+   sed -i app/include/user_modules.h -e "s/^\(#define LUA_USE_MODULES_\)/\/\/\1/" -e "/${_v%??}/s/\/\/\(#define LUA_USE_MODULES_.*\)/\1/" && \
+   sed -i app/include/user_config.h -e "s/#.*define SPIFFS_MAX_FILESYSTEM_SIZE.*0\x\(.*\)$/#define SPIFFS_MAX_FILESYSTEM_SIZE 0x100000/" -e "s/#.*define SPIFFS_FIXED_LOCATION.*0\x\(.*\)$/#define SPIFFS_FIXED_LOCATION 0x100000/" && make && ls -l bin
+$ make flash4m && picocom /dev/ttyUSB0
+```
+
 ```
 # get current partitions
 for i,j in pairs(node.getpartitiontable()) do print('%s = 0x%06x' % {i,j}) end
