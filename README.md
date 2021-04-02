@@ -102,9 +102,9 @@ $ make flash4m && picocom /dev/ttyUSB0
 
 ```
 # get current partitions
-for i,j in pairs(node.getpartitiontable()) do print('%s = 0x%06x' % {i,j}) end
+for i,j in pairs(node.getpartitiontable()) do print('%s = 0x%06x %d' % {i,j,j}) end
 # set new partition (warning, will delete all files!)
-node.setpartitiontable({lfs_addr=0x096000,lfs_size=0x010000,spiffs_addr=0x100000,spiffs_size=0x100000})
+node.setpartitiontable({lfs_addr=0x0c0000,lfs_size=0x010000,spiffs_addr=0x100000,spiffs_size=0x100000})
 # list files
 for i,j in pairs(file.list())do print(i,j) end
 ```
@@ -125,7 +125,7 @@ esptool.py write_flash 0x100000 bin/0x100000.bin && picocom /dev/ttyUSB0
 
 build an absolute lfs image of size 0x010000 (64 KB) (-a doesn't work, so i can't just flash it)
 ```
-./luac.cross -f -o bin/0x96000.img -a 0x96000 -m 65536 $(LFSSOURCES)
+./luac.cross -f -o bin/0xc0000.img -a 0xc0000 -m 65536 $(LFSSOURCES)
 ```
 
 ```
