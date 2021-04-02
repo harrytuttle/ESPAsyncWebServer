@@ -92,13 +92,14 @@ substitute for the list cmd
 http://witty.lan/edit?run=/local%20list={}table.foreach(file.list(),function(f,s)table.insert(list,{size=s,name=f})end)return%20cjson.encode(list)  
 
 
+```
 # get current partitions
 for i,j in pairs(node.getpartitiontable()) do print('%s = 0x%06x' % {i,j}) end
 # set new partition (warning, will delete all files!)
 node.setpartitiontable({lfs_addr=0x096000,lfs_size=0x010000,spiffs_addr=0x100000,spiffs_size=0x100000})
 # list files
 for i,j in pairs(file.list())do print(i,j) end
-
+```
 
 build a relative lfs image of size 0x010000 (64 KB)
 ```
