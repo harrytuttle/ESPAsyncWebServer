@@ -77,5 +77,54 @@ unneeded but probably useful modules:
 
 - gpio module
 
+another working combination of modules:
+adc,bit,cjson,crypto,dht,file,gpio,http,i2c,mdns,net,node,ow,pcm,perf,pwm,rtcmem,rtctime,sigma_delta,sntp,spi,struct,tmr,uart,wifi,ws2812
+
+a working combination of modules:
+bit,cron,crypto,encoder,file,gpio,http,i2c,mdns,net,node,rtctime,sjson,sntp,tmr,uart,websocket,wifi,wifi_monitor
+
+to flash (will use ttyUSB0 if available:
+```
+esptool.py write_flash 0x00000 ~/Scaricati/nodemcu-release-18-modules-2021-04-02-13-36-55-float.bin
+```
+
 substitute for the list cmd  
 http://witty.lan/edit?run=/local%20list={}table.foreach(file.list(),function(f,s)table.insert(list,{size=s,name=f})end)return%20cjson.encode(list)  
+
+
+# get current partitions
+for i,j in pairs(node.getpartitiontable()) do print('%s = 0x%06x' % {i,j}) end
+# set new partition (warning, will delete all files!)
+node.setpartitiontable({lfs_addr=0x096000,lfs_size=0x010000,spiffs_addr=0x100000,spiffs_size=0x100000})
+# list files
+for i,j in pairs(file.list())do print(i,j) end
+
+
+build a relative lfs image of size 0x010000 (64 KB)
+```
+./luac.cross -f -o local/fs/LFS.img -m 65536 $(find local/lua -type f -iname "*.lua"|xargs)
+# or 
+make -C tools LFSimage
+```
+build an spiffs image of size 0x100000 (1 MB)
+```
+find local/fs -type f -not -name ".gitignore"|\
+sed -e "s#^local/fs/\(.*\)#import local/fs/\1 \1#g" -e '$a\'"ls"''|\
+tools/spiffsimg/spiffsimg -f bin/0x100000.bin -c 0x100000 -i
+esptool.py write_flash 0x100000 bin/0x100000.bin && picocom /dev/ttyUSB0
+```
+
+build an absolute lfs image of size 0x010000 (64 KB) (-a doesn't work, so i can't just flash it)
+```
+./luac.cross -f -o bin/0x96000.img -a 0x96000 -m 65536 $(LFSSOURCES)
+```
+
+```
+node.LFS.reload('LFS.img')
+#list content of LFS
+for i,j in pairs(node.LFS.list())do print(i,j)end
+#run a function from LFS
+node.LFS.get("httpd")()()
+
+```
+
