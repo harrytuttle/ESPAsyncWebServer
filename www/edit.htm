@@ -267,40 +267,38 @@ function createFileUploader(element, tree, editor){
   }
 
   shell.onclick = function(e){
-    switch(Shell.style.borderStyle){
-      case "inset":Shell.style.borderStyle="outset";termleft.hidden=true;break;
-      case "outset":Shell.style.borderStyle="inset";termleft.hidden=false;break;
-      default:
-        termleft.hidden=false;
-        Shell.style.borderStyle="inset";
-        var repl=new Terminal(15,80,"> ");
+    switch(termleft.style.display){
+      case "block":termleft.style.display="none";break;
+      case "none":termleft.style.display="block";
+      if (!window.repl){
+        window.repl=new Terminal(15,80,"> ");
         repl.open(termleft);
         repl.on(function(cmd){
           requests.add("GET","/edit",{run:"/"+cmd},function(status,msg){if(status==200)repl.write(msg);});
         });
+      }
     }
   }
 
   serial.onclick = function(e){
     if (typeof WebSocket=="undefined")
       return false;
-    switch(Serial.style.borderStyle){
-      case "inset":Serial.style.borderStyle="outset";termright.hidden=true;break;
-      case "outset":Serial.style.borderStyle="inset";termright.hidden=false;break;
-      default:
-        ws=new WebSocket(location.origin.replace(/^http/,"ws"));
+    switch(termright.style.display){
+      case "block":termright.style.display="none";break;
+      case "none":termright.style.display="block";
+      if(!window.ws){
+        window.ws=new WebSocket(location.origin.replace(/^http/,"ws"));
         ws.onopen=function(){
-          termright.hidden=false;
-          Serial.style.borderStyle="inset";
           uart=new Terminal(15,80);
           uart.open(termright);
           uart.on(function(d){ws.send(d);});
           ws.onmessage=function(d){uart.write(d.data);};
-          ws.onclose=function(){termright.hidden=true;termright.innerHTML="";Serial.style.borderStyle="";};
+          ws.onclose=function(){termright.style.display="none";};
         }
+      }
     }
   }
-  
+
   mkfile.onclick = function(e){
     if(path.value.indexOf(".") === -1) return;
     createPath(path.value);
@@ -677,8 +675,8 @@ function Terminal(rows, cols, prompt) {
   <div id="tree"></div>
   <div id="editor"></div>
   <div id="preview" style="display:none;"></div>
-  <div hidden=true id="termleft"></div>
-  <div hidden=true id="termright"></div>
+  <div id="termleft" style="display:none;"></div>
+  <div id="termright" style="display:none;"></div>
   <iframe id=download-frame style='display:none;'></iframe>
 </body>
 </html>
