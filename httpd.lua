@@ -1,5 +1,5 @@
 return function(port,pwd,idx,wscb)
-  pwd=pwd and crypto.toBase64("admin:"..pwd)
+  pwd=pwd and encoder.toBase64("admin:"..pwd)
   local reply=function(c,msg,typ,len)
     c:send("HTTP/1.1 "..(tonumber(msg)and msg or 200).." OK\r\nContent-Type: "..(typ or "text/html")..(msg:match("^\31\139")and "\r\nContent-Encoding: gzip" or "").."\r\nConnection: close\r\nContent-Length: "..(len or #msg).."\r\n\r\n"..msg)
   end
@@ -36,7 +36,7 @@ return function(port,pwd,idx,wscb)
       if not hdrs then return reply(c,"400")end
       local key=hdrs:match("Sec%-Web[Ss]ocket%-Key: (.-)\r")
       if key and wsenc then
-        c:send("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "..crypto.toBase64(crypto.sha1(key.."258EAFA5-E914-47DA-95CA-C5AB0DC85B11")).."\r\n\r\n"..wsenc(wscb and wscb()))
+        c:send("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "..encoder.toBase64(crypto.sha1(key.."258EAFA5-E914-47DA-95CA-C5AB0DC85B11")).."\r\n\r\n"..wsenc(wscb and wscb()))
         c:on("disconnection",function(c)websockets[c]=nil end)websockets[c]=c key=nil
         return c:on("receive",function(c,m)return wscb and wscb(wsdec(m))end)
       elseif url:match("^edit")then
