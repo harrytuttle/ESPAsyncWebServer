@@ -42,7 +42,7 @@ return function(port,pwd,idx,wscb)
       elseif url:match("^edit")then
         if pwd and hdrs:match("Authorization: Basic ([%w+/=]+)")~=pwd then return reply(c,"401",'text/html\r\nWWW-Authenticate: Basic realm="Login"')end
         local cmd,arg=url:gsub('%%(%x%x)',function(h)return string.char(tonumber(h,16))end):match("?(%w+)=/(.*)")
-        if cmd=="list" then return reply(c,cjson.encode(file.list()))end
+        if cmd=="list" then return reply(c,sjson.encode(file.list()))end
         if cmd=="run" then node.output(function(p)if c:getpeer()then reply(c,p:read(1400) or "500")end node.output()return false end,0)return node.input(arg.."\n")end
         if cmd=="edit" then return serve(c,arg,"application/octet-stream\r\nContent-Disposition: attachment; filename='"..(arg:match("www/(.*)") or arg).."';")end
         local boundary=hdrs:match("Content%-Type: multipart/form%-data; boundary=(.-)\r")
